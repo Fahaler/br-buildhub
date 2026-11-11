@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseBrowserClient'
 import { useRouter, useParams } from 'next/navigation'
 
-export const instant = false
+
 
 export default function OrderDetailPage() {
   const router = useRouter()
