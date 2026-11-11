@@ -1,12 +1,11 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { supabase } from '@/lib/supabaseBrowserClient'
 import { useRouter, useParams } from 'next/navigation'
 
-
-
-export default function OrderDetailPage() {
+// Внутренний компонент — использует хуки
+function OrderContent() {
   const router = useRouter()
   const params = useParams()
   const orderId = params.id as string
@@ -402,5 +401,18 @@ export default function OrderDetailPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+// Внешний компонент — оборачивает в Suspense
+export default function OrderDetailPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-950 text-gray-100 flex items-center justify-center">
+        <p className="text-gray-400 text-lg animate-pulse">Загрузка заказа...</p>
+      </main>
+    }>
+      <OrderContent />
+    </Suspense>
   )
 }
