@@ -7,57 +7,93 @@ import { useRouter } from 'next/navigation'
 export default function NewOrderPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    cost: '',
-    status: 'в процессе'
-  })
-  const [imageFile, setImageFile] = useState<File | null>(null)
+ const [formData, setFormData] = useState({
+  title: '',
+  description: '',
+  cost: '',
+  status: 'в очереди',
+  priority: 'обычный'
+})
+  const [imageFile1, setImageFile1] = useState<File | null>(null)
+  const [imageFile2, setImageFile2] = useState<File | null>(null)
+  const [preview1, setPreview1] = useState('')
+  const [preview2, setPreview2] = useState('')
+
+  const handleImage1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageFile1(file)
+      const reader = new FileReader()
+      reader.onloadend = () => setPreview1(reader.result as string)
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleImage2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageFile2(file)
+      const reader = new FileReader()
+      reader.onloadend = () => setPreview2(reader.result as string)
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      let imageUrl = ''
+      let imageUrl1 = ''
+      let imageUrl2 = ''
 
-      // Если есть картинка — загружаем её в Storage
-      if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop()
-        const fileName = `${Date.now()}.${fileExt}`
-        const filePath = `${fileName}`
-
+      // Загружаем первое фото
+      if (imageFile1) {
+        const fileExt = imageFile1.name.split('.').pop()
+        const fileName = `${Date.now()}_1.${fileExt}`
         const { error: uploadError } = await supabase.storage
           .from('order-images')
-          .upload(filePath, imageFile)
-
+          .upload(fileName, imageFile1)
         if (uploadError) throw uploadError
 
-        // Получаем публичную ссылку на картинку
         const { data: { publicUrl } } = supabase.storage
           .from('order-images')
-          .getPublicUrl(filePath)
+          .getPublicUrl(fileName)
+        imageUrl1 = publicUrl
+      }
 
-        imageUrl = publicUrl
+      // Загружаем второе фото
+      if (imageFile2) {
+        const fileExt = imageFile2.name.split('.').pop()
+        const fileName = `${Date.now()}_2.${fileExt}`
+        const { error: uploadError } = await supabase.storage
+          .from('order-images')
+          .upload(fileName, imageFile2)
+        if (uploadError) throw uploadError
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('order-images')
+          .getPublicUrl(fileName)
+        imageUrl2 = publicUrl
       }
 
       // Создаем заказ в базе данных
-      const { error: insertError } = await supabase
-        .from('orders')
-        .insert([
-          {
-            title: formData.title,
-            description: formData.description,
-            cost: parseFloat(formData.cost) || 0,
-            status: formData.status,
-            image_url: imageUrl
-          }
-        ])
+     const { error: insertError } = await supabase
+  .from('orders')
+  .insert([
+    {
+      title: formData.title,
+      description: formData.description,
+      cost: parseFloat(formData.cost) || 0,
+      status: formData.status,
+      priority: formData.priority,
+      image_url: imageUrl1,
+      image_url_2: imageUrl2
+    }
+  ])
 
       if (insertError) throw insertError
 
-      // Возвращаемся на главную
       router.push('/')
       router.refresh()
     } catch (error) {
@@ -112,47 +148,83 @@ export default function NewOrderPage() {
           </div>
 
           {/* Стоимость и Статус */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Стоимость (руб)
-              </label>
-              <input
-                type="number"
-                value={formData.cost}
-                onChange={(e) => setFormData({...formData, cost: e.target.value})}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
-                placeholder="500"
-              />
-            </div>
+          {/* Стоимость и Статус */}
+<div className="grid grid-cols-2 gap-4">
+  <div>
+    <label className="block text-sm font-medium text-gray-300 mb-2">
+      Стоимость (руб)
+    </label>
+    <input
+      type="number"
+      value={formData.cost}
+      onChange={(e) => setFormData({...formData, cost: e.target.value})}
+      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+      placeholder="500"
+    />
+  </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Статус
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({...formData, status: e.target.value})}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
-              >
-                <option value="в процессе">В процессе</option>
-                <option value="готов">Готов</option>
-                <option value="отмена">Отмена</option>
-              </select>
-            </div>
-          </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-300 mb-2">
+      Статус
+    </label>
+    <select
+      value={formData.status}
+      onChange={(e) => setFormData({...formData, status: e.target.value})}
+      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+    >
+      <option value="в очереди">В очереди</option>
+      <option value="в процессе">В процессе</option>
+      <option value="готов">Готов</option>
+      <option value="отмена">Отмена</option>
+    </select>
+  </div>
+</div>
 
-          {/* Загрузка фото */}
+{/* Приоритет */}
+<div>
+  <label className="block text-sm font-medium text-gray-300 mb-2">
+    Приоритет
+  </label>
+  <select
+    value={formData.priority}
+    onChange={(e) => setFormData({...formData, priority: e.target.value})}
+    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+  >
+    <option value="обычный">Обычный</option>
+    <option value="высокий">Высокий 🔥</option>
+  </select>
+</div>
+
+          {/* Загрузка фото 1 */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Фото постройки
+              Фото 1
             </label>
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+              onChange={handleImage1Change}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-600 file:text-white hover:file:bg-blue-500"
             />
+            {preview1 && (
+              <img src={preview1} alt="Preview 1" className="mt-2 max-h-48 rounded-lg border border-gray-700" />
+            )}
+          </div>
+
+          {/* Загрузка фото 2 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Фото 2 (необязательно)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImage2Change}
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-600 file:text-white hover:file:bg-blue-500"
+            />
+            {preview2 && (
+              <img src={preview2} alt="Preview 2" className="mt-2 max-h-48 rounded-lg border border-gray-700" />
+            )}
           </div>
 
           {/* Кнопка отправки */}
