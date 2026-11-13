@@ -1,26 +1,92 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   BR BuildHub — «Пульт». Тёмный тёплый цех, янтарный сигнальный акцент.
+   ============================================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0f0e0c;
+  --panel: #171512;
+  --panel-2: #201d19;
+  --line: #2c2823;
+  --text: #ece5d8;
+  --muted: #8c8374;
+  --amber: #ffb000;
+  --green: #7bc96f;
+  --red: #ff5a3c;
+  --idle: #6f8796;
+  --sale: #c99cff;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html,
+  body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
   }
+  body {
+    font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--amber); color: #000; }
+  button:not(:disabled), [role='button'] { cursor: pointer; }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.font-display { font-family: var(--font-display), system-ui, sans-serif; }
+.font-mono-ui { font-family: var(--font-mono), ui-monospace, monospace; }
+
+.cs-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cs-key {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  line-height: 16px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0 5px;
+  color: var(--muted);
+}
+.cs-led { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35); }
+.cs-led.on { box-shadow: 0 0 10px 1px currentColor; }
+.cs-scroll { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.cs-row[aria-selected='true'] { background: var(--panel-2); box-shadow: inset 3px 0 0 var(--amber); }
+.cs-row:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.cs-field {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.cs-field:focus { border-color: var(--amber); }
+.cs-field::placeholder { color: var(--muted); opacity: 0.7; }
+.cs-field[type='date'] { color-scheme: dark; }
+.cs-hazard { background: repeating-linear-gradient(-45deg, var(--amber) 0 8px, transparent 8px 16px); }
+.cs-btn {
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.cs-btn:disabled { opacity: 0.5; cursor: default; }
+.cs-btn:focus-visible, .cs-seg button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+@keyframes cs-blink { 50% { opacity: 0.25; } }
+.cs-blink { animation: cs-blink 1.4s steps(1) infinite; }
+@keyframes cs-slide { from { transform: translateX(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cs-slide { animation: cs-slide 0.18s ease-out; }
+@keyframes cs-up { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cs-up { animation: cs-up 0.18s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-blink, .cs-slide, .cs-up { animation: none; }
 }

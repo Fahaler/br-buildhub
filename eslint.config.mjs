@@ -5,6 +5,11 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    // Фото уже сжаты при загрузке (WebP, до 1600 px) и отдаются из Supabase Storage,
+    // поэтому next/image с платной оптимизацией Vercel здесь не нужен.
+    rules: { "@next/next/no-img-element": "off" },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

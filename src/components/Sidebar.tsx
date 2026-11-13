@@ -1,22 +1,64 @@
 "use client"
 
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Suspense } from 'react'
+import { usePathname } from 'next/navigation'
+import { useAuth } from '@/components/AuthProvider'
+import { useToast } from '@/components/Toaster'
+
+const linkBase = 'w-full flex items-center gap-3 transition p-2 rounded-lg text-left'
+
+const navClass = (active: boolean) =>
+  `${linkBase} ${active ? 'bg-gray-800 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-800'}`
+
+function NavLinks({ pathname, onClose }: { pathname: string | null; onClose?: () => void }) {
+  const { isAdmin } = useAuth()
+  return (
+    <>
+      <Link href="/" onClick={onClose} className={navClass(pathname === '/' || !!pathname?.startsWith('/orders'))}>
+        <span>📋</span>
+        <span>Заказы</span>
+      </Link>
+      {isAdmin && (
+        <Link href="/new-order" onClick={onClose} className={navClass(pathname === '/new-order')}>
+          <span>➕</span>
+          <span>Новый заказ</span>
+        </Link>
+      )}
+    </>
+  )
+}
+
+// Подсветка текущего раздела (usePathname должен быть внутри Suspense)
+function ActiveNavLinks({ onClose }: { onClose?: () => void }) {
+  return <NavLinks pathname={usePathname()} onClose={onClose} />
+}
 
 export default function Sidebar({ onClose }: { onClose?: () => void }) {
-  const router = useRouter()
+  const toast = useToast()
+
+  const copyDiscord = async () => {
+    try {
+      await navigator.clipboard.writeText('FaHaLeR')
+      toast('Ник FaHaLeR скопирован', 'success')
+    } catch {
+      toast('Не удалось скопировать. Ник в Discord: FaHaLeR', 'info')
+    }
+  }
 
   return (
     <aside className="w-64 bg-gray-950 border-r border-gray-800 flex flex-col flex-shrink-0 h-full">
       {/* Логотип и название */}
       <div className="p-6 border-b border-gray-800">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-blue-400 flex items-center gap-2">
+          <Link href="/" onClick={onClose} className="text-xl font-bold text-blue-400 flex items-center gap-2">
             🧱 BR BuildHub
-          </h1>
+          </Link>
           {/* Кнопка закрытия только на мобильных */}
           <button 
             onClick={onClose}
             className="lg:hidden text-gray-400 hover:text-white p-1"
+            aria-label="Закрыть меню"
           >
             ✕
           </button>
@@ -26,20 +68,9 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
 
       {/* Основное меню */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        <button
-          onClick={() => { router.push('/'); onClose?.() }}
-          className="w-full flex items-center gap-3 text-gray-300 hover:text-white transition p-2 rounded-lg hover:bg-gray-800 text-left"
-        >
-          <span>📋</span>
-          <span>Заказы</span>
-        </button>
-        <button
-          onClick={() => { router.push('/new-order'); onClose?.() }}
-          className="w-full flex items-center gap-3 text-gray-300 hover:text-white transition p-2 rounded-lg hover:bg-gray-800 text-left"
-        >
-          <span>➕</span>
-          <span>Новый заказ</span>
-        </button>
+        <Suspense fallback={<NavLinks pathname={null} onClose={onClose} />}>
+          <ActiveNavLinks onClose={onClose} />
+        </Suspense>
       </nav>
 
       {/* Контакты внизу */}
@@ -64,10 +95,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
 
         {/* Discord */}
         <button 
-          onClick={() => {
-            navigator.clipboard.writeText('FaHaLeR')
-            alert('Никнейм FaHaLeR скопирован!')
-          }}
+          onClick={copyDiscord}
           className="w-full flex items-center gap-3 text-gray-300 hover:text-indigo-400 transition p-2 rounded-lg hover:bg-gray-800 group text-left"
           title="Нажми, чтобы скопировать"
         >

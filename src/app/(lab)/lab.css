@@ -1,0 +1,210 @@
+/* Макеты дизайна. Каждый вариант живёт под своим классом: .lab-ws, .lab-tg, .lab-cs */
+
+.lab-root {
+  height: 100dvh;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ============================================================ 3. МАСТЕРСКАЯ */
+.lab-ws {
+  --bg: #13110e;
+  --panel: #1c1915;
+  --panel-2: #24201b;
+  --line: #322c25;
+  --text: #efe7d8;
+  --muted: #9c917f;
+  --sig: #ffb400;
+  --hot: #ff5c1f;
+  color-scheme: dark;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ws-body), system-ui, sans-serif;
+}
+.lab-ws ::selection { background: var(--sig); color: #000; }
+.ws-display {
+  font-family: var(--font-ws-display), Impact, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+}
+.ws-kicker {
+  font-family: var(--font-ws-display), Impact, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 12px;
+  color: var(--muted);
+}
+.ws-hazard {
+  background: repeating-linear-gradient(-45deg, var(--sig) 0 12px, #13110e 12px 24px);
+}
+.ws-grain {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+.ws-card img { transition: transform 0.5s ease, filter 0.3s ease; }
+.ws-card:hover img,
+.ws-card:focus-visible img { transform: scale(1.04); }
+.ws-card:focus-visible { outline: 2px solid var(--sig); outline-offset: 3px; }
+@keyframes ws-blink { 50% { opacity: 0.25; } }
+.ws-blink { animation: ws-blink 1.4s steps(1) infinite; }
+@keyframes ws-fade { from { opacity: 0; } to { opacity: 1; } }
+.ws-fade { animation: ws-fade 0.2s ease-out; }
+
+/* ============================================================ 4. БИРКИ */
+.lab-tg {
+  --board: #1a1712;
+  --hole: #0b0a08;
+  --tag: #eadfc3;
+  --tag-2: #ddcfae;
+  --ink: #221d15;
+  --ink-2: #6e624e;
+  --orange: #ff6a1a;
+  --green: #2f7d3b;
+  --text: #efe6d4;
+  --muted: #9d927d;
+  --line: #3a3329;
+  color-scheme: dark;
+  min-height: 100%;
+  color: var(--text);
+  font-family: var(--font-tg-body), system-ui, sans-serif;
+  background-color: var(--board);
+  /* перфорированная панель гаража */
+  background-image: radial-gradient(circle at 50% 50%, var(--hole) 0 3px, rgba(255, 255, 255, 0.05) 3.8px, transparent 4.8px);
+  background-size: 26px 26px;
+}
+.lab-tg ::selection { background: var(--orange); color: #000; }
+.tg-display { font-family: var(--font-tg-display), system-ui, sans-serif; }
+.tg-mono { font-family: var(--font-tg-mono), ui-monospace, monospace; }
+.tg-plate {
+  background: #15120e;
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.8);
+}
+.tg-tag {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--tag);
+  color: var(--ink);
+  border-radius: 6px 6px 8px 8px;
+  padding: 30px 14px 14px;
+  clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%, 0 14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.55));
+  transform-origin: 50% 0;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+/* люверс — дырка, на которой висит бирка */
+.tg-tag::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--board);
+  box-shadow: 0 0 0 3px #b3a281, inset 0 2px 3px rgba(0, 0, 0, 0.7);
+}
+button.tg-tag:hover { transform: rotate(0deg) translateY(-3px) !important; filter: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.6)); }
+button.tg-tag:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.tg-tag.is-draft { background: #f4eddc; }
+.tg-tag.is-draft::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 2px dashed var(--orange);
+  border-radius: 4px;
+  pointer-events: none;
+}
+.tg-hazard { background: repeating-linear-gradient(-45deg, var(--orange) 0 9px, var(--ink) 9px 18px); }
+.tg-stamp {
+  font-family: var(--font-tg-display), system-ui, sans-serif;
+  color: var(--green);
+  border: 2.5px solid var(--green);
+  border-radius: 4px;
+  padding: 1px 7px;
+  transform: rotate(-8deg);
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+.tg-input {
+  width: 100%;
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  outline: none;
+}
+.tg-input::placeholder { color: var(--muted); }
+@keyframes tg-pop { from { transform: translateY(-12px) rotate(-3deg); opacity: 0; } to { opacity: 1; } }
+.tg-pop { animation: tg-pop 0.35s cubic-bezier(0.2, 1.4, 0.5, 1); }
+@keyframes tg-drawer { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.tg-drawer { animation: tg-drawer 0.22s ease-out; }
+
+/* ============================================================ 5. ПУЛЬТ */
+.lab-cs {
+  --bg: #0f0e0c;
+  --panel: #171512;
+  --panel-2: #201d19;
+  --line: #2c2823;
+  --text: #ece5d8;
+  --muted: #8c8374;
+  --amber: #ffb000;
+  --green: #7bc96f;
+  --red: #ff5a3c;
+  --idle: #6f8796;
+  color-scheme: dark;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-cs-body), system-ui, sans-serif;
+}
+.lab-cs ::selection { background: var(--amber); color: #000; }
+.cs-display { font-family: var(--font-cs-display), system-ui, sans-serif; }
+.cs-mono { font-family: var(--font-cs-mono), ui-monospace, monospace; }
+.cs-label {
+  font-family: var(--font-cs-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cs-key {
+  font-family: var(--font-cs-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  line-height: 16px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0 5px;
+  color: var(--muted);
+}
+.cs-led { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35); }
+.cs-led.on { box-shadow: 0 0 10px 1px currentColor; }
+.cs-scroll { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.cs-row[aria-selected='true'] { background: var(--panel-2); box-shadow: inset 3px 0 0 var(--amber); }
+.cs-row:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.cs-field {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--text);
+  outline: none;
+}
+.cs-field:focus { border-color: var(--amber); }
+.cs-field::placeholder { color: var(--muted); }
+.cs-hazard { background: repeating-linear-gradient(-45deg, var(--amber) 0 8px, transparent 8px 16px); }
+@keyframes cs-slide { from { transform: translateX(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cs-slide { animation: cs-slide 0.18s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-fade, .ws-blink, .tg-pop, .tg-drawer, .cs-slide { animation: none; }
+  .ws-card img, .tg-tag { transition: none; }
+}
